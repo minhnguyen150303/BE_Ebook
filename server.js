@@ -2,6 +2,8 @@ const express = require("express");
 const mongoose = require("mongoose");
 require("dotenv").config();
 const authRoutes = require("./routes/auth.js");
+const bookRoutes = require("./routes/book");
+const categoryRoutes = require("./routes/category");
 const cors = require("cors");
 const path = require("path");
 
@@ -12,6 +14,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/auth", authRoutes);
+app.use("/book", bookRoutes);
+app.use("/category", categoryRoutes);
 
 const PORT = process.env.PORT || 5000;
 

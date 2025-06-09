@@ -147,7 +147,7 @@ exports.updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Không tìm thấy người dùng" });
 
     if (req.file && req.file.path) {
-      user.avatar = `/uploads/avatars/${req.file.filename}`;
+      user.avatar = `http://localhost:5000/uploads/avatars/${req.file.filename}`;
     }
 
     if (name) user.name = name;

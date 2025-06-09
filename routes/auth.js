@@ -1,4 +1,4 @@
-//
+// http://localhost:5000/auth/
 const express = require("express");
 const router = express.Router();
 const authController = require("../controllers/auth.js");
