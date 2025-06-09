@@ -21,7 +21,8 @@
     "mongoose": "^8.15.0",
     "multer": "^2.0.0",
     "pdf-parse": "^1.1.1",
-    "textract": "^2.5.0"
+    "textract": "^2.5.0",
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
     "nodemon": "^3.1.10"

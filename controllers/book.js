@@ -68,9 +68,9 @@ const getChaptersByBook = async (req, res) => {
   try {
     const book = await Book.findById(req.params.id);
     if (!book) return res.status(404).json({ message: "Không tìm thấy sách" });
-    const chapters = await BookChapter.find({ book: book._id }).sort(
-      "chapter_number"
-    );
+    const chapters = await BookChapter.find({ book: book._id })
+      .sort("chapter_number")
+      .select("-content");
     res.status(200).json({ success: true, chapters });
   } catch (error) {
     console.error("Lỗi lấy danh sách chương:", error);
@@ -118,6 +118,9 @@ const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
     const book = await Book.findById(id);
+
+    // Tăng lượt xem
+    await Book.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
     if (!book || !book.is_active) {
       return res.status(404).json({ message: "Không tìm thấy sách" });

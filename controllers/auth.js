@@ -46,6 +46,12 @@ exports.login = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(400).json({ message: "Email không tồn tại." });
 
+    if (!user.is_active) {
+      return res.status(403).json({
+        message:
+          "Tài khoản của bạn đã bị tạm khóa. Vui lòng liên hệ quản trị viên.",
+      });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json({ message: "Sai mật khẩu." });
 
@@ -128,6 +134,12 @@ exports.toggleUserStatus = async (req, res) => {
     user.is_active = !user.is_active;
     await user.save();
 
+    const io = req.app.get("io");
+    io.emit("user-status-changed", {
+      userId: user._id.toString(),
+      is_active: user.is_active,
+    });
+
     res.status(200).json({
       message: "Đã cập nhật trạng thái người dùng",
       is_active: user.is_active,
@@ -136,7 +148,6 @@ exports.toggleUserStatus = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi cập nhật trạng thái người dùng" });
   }
 };
-
 exports.updateProfile = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -147,7 +158,7 @@ exports.updateProfile = async (req, res) => {
       return res.status(400).json({ message: "Không tìm thấy người dùng" });
 
     if (req.file && req.file.path) {
-      user.avatar = `http://localhost:5000/uploads/avatars/${req.file.filename}`;
+      user.avatar = `/uploads/avatars/${req.file.filename}`;
     }
 
     if (name) user.name = name;
