@@ -176,6 +176,12 @@ const toggleBookStatus = async (req, res) => {
     book.is_active = !book.is_active;
     await book.save();
 
+    // const io = req.app.get("io");
+    // io.emit("book-status-changed", {
+    //   bookId: book._id.toString(),
+    //   is_active: book.is_active,
+    // });
+
     res.status(200).json({
       message: "Đã cập nhật trạng thái sách",
       is_active: book.is_active,

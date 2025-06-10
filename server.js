@@ -6,6 +6,7 @@ const bookRoutes = require("./routes/book");
 const categoryRoutes = require("./routes/category");
 const bookmarkRoutes = require("./routes/bookmark");
 const favoriteRoutes = require("./routes/favorite");
+const commentRoutes = require("./routes/comment");
 const cors = require("cors");
 const path = require("path");
 const app = express();
@@ -17,11 +18,23 @@ const io = new Server(server, {
     origin: "*",
   },
 });
+
 app.set("io", io);
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
+
 io.on("connection", (socket) => {
-  console.log("user connected", socket.id);
+  console.log("client connected", socket.id);
+
+  socket.on("join-book", (book) => {
+    socket.join(book);
+    console.log(`📚 Client ${socket.id} đã vào phòng sách ${book}`);
+  });
+
   socket.on("disconnect", () => {
-    console.log("user disconnected", socket.id);
+    console.log("client disconnected", socket.id);
   });
 });
 
@@ -35,6 +48,7 @@ app.use("/book", bookRoutes);
 app.use("/category", categoryRoutes);
 app.use("/bookmark", bookmarkRoutes);
 app.use("/favorite", favoriteRoutes);
+app.use("/comment", commentRoutes);
 
 const PORT = process.env.PORT || 5000;
 
