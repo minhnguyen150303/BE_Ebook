@@ -52,5 +52,7 @@ router.patch(
 
 router.patch("/status/:id", auth, isAdmin, bookController.toggleBookStatus);
 router.delete("/delete/:id", auth, isAdmin, bookController.deleteBook);
+router.get("/category/:categoryId", bookController.getBooksByCategory);
+router.get("/top-view", bookController.getTopViewedBooks);
 
 module.exports = router;

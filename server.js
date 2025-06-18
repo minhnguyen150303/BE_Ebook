@@ -7,6 +7,7 @@ const categoryRoutes = require("./routes/category");
 const bookmarkRoutes = require("./routes/bookmark");
 const favoriteRoutes = require("./routes/favorite");
 const commentRoutes = require("./routes/comment");
+const reportRoutes = require("./routes/report");
 const cors = require("cors");
 const path = require("path");
 const app = express();
@@ -49,6 +50,7 @@ app.use("/category", categoryRoutes);
 app.use("/bookmark", bookmarkRoutes);
 app.use("/favorite", favoriteRoutes);
 app.use("/comment", commentRoutes);
+app.use("/report", reportRoutes);
 
 const PORT = process.env.PORT || 5000;
 
@@ -56,6 +58,8 @@ mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
     console.log("MongoDB connected");
-    server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+    server.listen(PORT, "0.0.0.0", () =>
+      console.log(`Server running on port ${PORT}`)
+    );
   })
   .catch((err) => console.error(err));

@@ -221,6 +221,34 @@ const deleteBook = async (req, res) => {
     res.status(500).json({ message: "Lỗi server" });
   }
 };
+const getBooksByCategory = async (req, res) => {
+  try {
+    const { categoryId } = req.params;
+
+    const books = await Book.find({ category: categoryId, is_active: true })
+      .populate("category", "name")
+      .sort({ created_at: -1 });
+
+    res.status(200).json({ success: true, books });
+  } catch (err) {
+    console.error("Lỗi lấy sách theo thể loại:", err);
+    res.status(500).json({ message: "Lỗi server khi lấy sách theo thể loại." });
+  }
+};
+const getTopViewedBooks = async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 5;
+    const topBooks = await Book.find()
+      .sort({ views: -1 })
+      .limit(limit)
+      .select("title author views");
+
+    res.json({ success: true, data: topBooks });
+  } catch (err) {
+    console.error("Lỗi khi lấy sách top view:", err);
+    res.status(500).json({ message: "Lỗi server khi thống kê." });
+  }
+};
 
 module.exports = {
   createBook,
@@ -231,4 +259,6 @@ module.exports = {
   updateCover,
   toggleBookStatus,
   deleteBook,
+  getBooksByCategory,
+  getTopViewedBooks,
 };
