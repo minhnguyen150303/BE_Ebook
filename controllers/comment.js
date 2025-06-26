@@ -11,7 +11,7 @@ exports.createComment = async (req, res) => {
       comment,
     });
 
-    await newComment.populate("user", "name avatar");
+    await newComment.populate("user", "name avatar is_active role");
 
     req.io.to(book).emit("new-comment", newComment);
 
@@ -26,7 +26,7 @@ exports.getCommentsByBook = async (req, res) => {
   try {
     const { bookId } = req.params;
     const comments = await Comment.find({ book: bookId, is_hidden: false })
-      .populate("user", "name avatar")
+      .populate("user", "name avatar is_active role")
       .sort({ created_at: -1 });
 
     res.json({ success: true, comments });
@@ -36,6 +36,19 @@ exports.getCommentsByBook = async (req, res) => {
   }
 };
 
+exports.getAllCommentsByBook = async (req, res) => {
+  try {
+    const { bookId } = req.params;
+    const comments = await Comment.find({ book: bookId })
+      .populate("user", "name avatar is_active role")
+      .sort({ created_at: -1 });
+
+    res.json({ success: true, comments });
+  } catch (err) {
+    console.error("Lỗi lấy bình luận:", err);
+    res.status(500).json({ message: "Lỗi server khi lấy bình luận." });
+  }
+};
 exports.updateComment = async (req, res) => {
   try {
     const { comment, rating } = req.body;

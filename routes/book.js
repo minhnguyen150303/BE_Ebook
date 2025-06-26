@@ -25,9 +25,11 @@ router.post(
 );
 
 router.get("/get-all", bookController.getAllBooks);
-
+//admin dùng thôi
+router.get("/get-book-lock", auth, isAdmin, bookController.getBookLock);
 router.get("/get-detail/:id", bookController.getBookById);
-
+//admin dùng thôi
+router.get("/get-all-detail/:id", auth, isAdmin, bookController.getAllBookById);
 router.get("/menu/:id", bookController.getChaptersByBook);
 router.get(
   "/chapter/:bookId/:chapter_number",
@@ -53,6 +55,7 @@ router.patch(
 router.patch("/status/:id", auth, isAdmin, bookController.toggleBookStatus);
 router.delete("/delete/:id", auth, isAdmin, bookController.deleteBook);
 router.get("/category/:categoryId", bookController.getBooksByCategory);
+//ds sách có lượt view cao nhất
 router.get("/top-view", bookController.getTopViewedBooks);
 
 module.exports = router;

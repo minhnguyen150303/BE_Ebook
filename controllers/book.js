@@ -103,7 +103,9 @@ const getChapterContent = async (req, res) => {
 
 const getAllBooks = async (req, res) => {
   try {
-    const books = await Book.find({ is_active: true }).sort({ createdAt: -1 });
+    const books = await Book.find({ is_active: true })
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
     res.status(200).json({
       success: true,
       books,
@@ -113,16 +115,50 @@ const getAllBooks = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi lấy danh sách sách" });
   }
 };
-
+const getBookLock = async (req, res) => {
+  try {
+    const books = await Book.find({ is_active: false })
+      .populate("category", "name")
+      .sort({ createdAt: -1 });
+    res.status(200).json({
+      success: true,
+      books,
+    });
+  } catch (error) {
+    console.error("Lỗi lấy danh sách sách:", error);
+    res.status(500).json({ message: "Lỗi server khi lấy danh sách sách" });
+  }
+};
 const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await Book.findById(id);
+    const book = await Book.findById(id).populate("category", "name");
 
     // Tăng lượt xem
     await Book.findByIdAndUpdate(id, { $inc: { views: 1 } });
 
     if (!book || !book.is_active) {
+      return res.status(404).json({ message: "Không tìm thấy sách" });
+    }
+
+    res.status(200).json({
+      success: true,
+      book,
+    });
+  } catch (error) {
+    console.error("Lỗi lấy sách theo ID:", error);
+    res.status(500).json({ message: "Lỗi server khi lấy sách theo ID" });
+  }
+};
+const getAllBookById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const book = await Book.findById(id).populate("category", "name");
+
+    // Tăng lượt xem
+    await Book.findByIdAndUpdate(id);
+
+    if (!book) {
       return res.status(404).json({ message: "Không tìm thấy sách" });
     }
 
@@ -253,7 +289,9 @@ const getTopViewedBooks = async (req, res) => {
 module.exports = {
   createBook,
   getAllBooks,
+  getBookLock,
   getBookById,
+  getAllBookById,
   getChaptersByBook,
   getChapterContent,
   updateCover,

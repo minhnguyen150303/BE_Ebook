@@ -19,7 +19,7 @@ function getStartDateByRange(range) {
       now.setFullYear(now.getFullYear() - 1);
       break;
     default:
-      now.setDate(now.getDate() - 7); // Mặc định là 7 ngày gần nhất
+      now.setDate(now.getDate() - 7);
   }
   return now;
 }
