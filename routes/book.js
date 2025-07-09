@@ -51,7 +51,7 @@ router.patch(
   uploadBookCover.single("cover_url"),
   bookController.updateCover
 );
-
+router.get("/no-view/:id", bookController.getBookByIdNoView);
 router.patch("/status/:id", auth, isAdmin, bookController.toggleBookStatus);
 router.delete("/delete/:id", auth, isAdmin, bookController.deleteBook);
 router.get("/category/:categoryId", bookController.getBooksByCategory);

@@ -10,9 +10,11 @@ const commentRoutes = require("./routes/comment");
 const reportRoutes = require("./routes/report");
 const cors = require("cors");
 const path = require("path");
-const app = express();
+
 const http = require("http");
 const { Server } = require("socket.io");
+
+const app = express();
 const server = http.createServer(app);
 
 const io = new Server(server, {
@@ -22,6 +24,7 @@ const io = new Server(server, {
 });
 
 app.set("io", io);
+
 app.use((req, res, next) => {
   req.io = io;
   next();
@@ -29,6 +32,11 @@ app.use((req, res, next) => {
 
 io.on("connection", (socket) => {
   console.log("client connected", socket.id);
+
+  socket.on("send-message", (data) => {
+    // Dữ liệu gửi về dạng { userId, name, message, timestamp }
+    io.emit("receive-message", data); // Gửi lại cho tất cả client
+  });
 
   socket.on("join-book", (book) => {
     socket.join(book);

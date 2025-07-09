@@ -69,6 +69,8 @@ exports.updateComment = async (req, res) => {
     if (rating !== undefined) existingComment.rating = rating;
 
     await existingComment.save();
+    await existingComment.populate("user", "name avatar is_active role");
+
     req.io
       .to(existingComment.book.toString())
       .emit("comment-updated", existingComment);
@@ -85,6 +87,10 @@ exports.updateComment = async (req, res) => {
 
 exports.toggleComment = async (req, res) => {
   try {
+    if (req.user.role !== "admin") {
+      return res.status(403).json({ message: "Chỉ admin mới được ẩn/hiện bình luận." });
+    }
+
     const commentId = req.params.id;
     const comment = await Comment.findById(commentId);
 
@@ -93,6 +99,9 @@ exports.toggleComment = async (req, res) => {
 
     comment.is_hidden = !comment.is_hidden;
     await comment.save();
+
+    await comment.populate("user", "name avatar is_active role");
+    req.io.to(comment.book.toString()).emit("comment-updated", comment);
 
     res.json({
       success: true,

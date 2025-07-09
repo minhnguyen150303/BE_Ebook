@@ -129,13 +129,41 @@ const getBookLock = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi lấy danh sách sách" });
   }
 };
+
+
+// const getBookById = async (req, res) => {
+//   try {
+//     const { id } = req.params;
+//     const book = await Book.findById(id).populate("category", "name");
+
+//     // Tăng lượt xem
+//     await Book.findByIdAndUpdate(id, { $inc: { views: 1 } });
+
+//     if (!book || !book.is_active) {
+//       return res.status(404).json({ message: "Không tìm thấy sách" });
+//     }
+
+//     res.status(200).json({
+//       success: true,
+//       book,
+//     });
+//   } catch (error) {
+//     console.error("Lỗi lấy sách theo ID:", error);
+//     res.status(500).json({ message: "Lỗi server khi lấy sách theo ID" });
+//   }
+// };
+
+
 const getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    const book = await Book.findById(id).populate("category", "name");
 
-    // Tăng lượt xem
-    await Book.findByIdAndUpdate(id, { $inc: { views: 1 } });
+    // ✅ Gộp tăng views + trả về luôn bản mới
+    const book = await Book.findByIdAndUpdate(
+      id,
+      { $inc: { views: 1 } },
+      { new: true }
+    ).populate("category", "name");
 
     if (!book || !book.is_active) {
       return res.status(404).json({ message: "Không tìm thấy sách" });
@@ -150,6 +178,21 @@ const getBookById = async (req, res) => {
     res.status(500).json({ message: "Lỗi server khi lấy sách theo ID" });
   }
 };
+
+const getBookByIdNoView = async (req, res) => {
+  try {
+    const book = await Book.findById(req.params.id).populate("category", "name");
+    if (!book || !book.is_active) {
+      return res.status(404).json({ message: "Không tìm thấy sách" });
+    }
+    res.status(200).json({ success: true, book });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server khi lấy sách (no view)" });
+  }
+};
+
+
+
 const getAllBookById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -277,7 +320,7 @@ const getTopViewedBooks = async (req, res) => {
     const topBooks = await Book.find()
       .sort({ views: -1 })
       .limit(limit)
-      .select("title author views");
+      .select("title author views cover_url");
 
     res.json({ success: true, data: topBooks });
   } catch (err) {
@@ -299,4 +342,5 @@ module.exports = {
   deleteBook,
   getBooksByCategory,
   getTopViewedBooks,
+  getBookByIdNoView,
 };
